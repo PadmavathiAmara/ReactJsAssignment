@@ -1,24 +1,38 @@
-import logo from './logo.svg';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css';
+import Dashboard from './Components/Dashboard';
+import SignIn from './Components/SignIn';
+import { useGoogleLogin } from '@react-oauth/google';
+import { useState } from 'react';
+import Protected from './Components/Protected';
 
-function App() {
+const App = () => {
+
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  const login = useGoogleLogin({
+
+    onSuccess: (codeResponse) => {
+      setUser(codeResponse)
+      navigate('/dashboard');
+    },
+
+    onError: (error) => console.log('Login failed', error)
+    
+  });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Routes>
+        <Route path='/' element={<SignIn onGoogleClick={login} />} />
+        <Route path='/dashboard' element={
+          // <Protected isSignedIn={!!user}>
+            <Dashboard />
+          // </Protected>
+        } />
+      </Routes>
+    </>
   );
 }
 
